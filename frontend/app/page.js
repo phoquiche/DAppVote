@@ -10,40 +10,41 @@ import { useState } from 'react';
 export default function Home() {
 
   // The State that will get the number on the blockchain (get method)
-  const [getNumber, setGetNumber] = useState()
-  // The State that will keep track of the user input (set method)
-  const [setNumber, setSetNumber] = useState()
-  // We get the address from rainbowkit and if the user is connected or not
-  const { address, isConnected } = useAccount()
+  const [getVotingPhase, setVotingPhase] = useState('');
+  const [setAddress, setSetAddress] = useState();
 
-  const getTheNumber = async() => {
+
+  const { isConnected } = useAccount();
+
+  const fetchVotingPhase = async () => {
     const data = await readContract({
       address: contractAddress,
       abi: abi,
-      functionName: 'retrieve',
-    })
-    setGetNumber(Number(data))
-  }
+      functionName: 'getPhase',
+    });
+    setVotingPhase(data);
+  };
 
-  const changeNumber = async() => {
-    const { request } = await prepareWriteContract({
-      address: contractAddress,
-      abi: abi,
-      functionName: 'store',
-      args: [setNumber]
-    })
-    const { hash } = await writeContract(request)
-    await getTheNumber()
-    setSetNumber()
-  }
+  const registerVoter = async () => {
+      const { request } = await prepareWriteContract({
+        address: contractAddress,
+        abi: abi,
+        functionName: 'registerVoter',
+        args: [setAddress],
+      });
+      const { hash } = await writeContract(request);
+      console.log('Transaction hash:', hash);
+      // Optionally, you can update the UI or display a success message
+  };
+
 
   return (
     <>
       <ConnectButton />
       {isConnected ? (
         <div>
-          <p><button onClick={getTheNumber}>Get The Number</button> : {getNumber}</p>
-          <p><input type="number" onChange={(e) => setSetNumber(e.target.value)} /> <button onClick={changeNumber}>Change the number</button></p>
+          <p><button onClick={fetchVotingPhase}>Fetch Voting Phase</button> : {getVotingPhase}</p>
+          <p><input type="string" onChange={(e) => setSetAddress(e.target.value)} /> <button onClick={registerVoter}>Insert an address</button></p>
         </div>
       ) : (
         <p>Please connect your Wallet to our DApp.</p>
