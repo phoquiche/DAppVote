@@ -8,10 +8,11 @@ contract SimpleStorage is Ownable{
      
     WorkflowStatus votingPhase;
     address[] private _listVoters ;
-    uint[]   listCount;
+    uint[] listCount;
     Proposal[] listProposal;
     event phaseUpdated(WorkflowStatus _status);
     event hasVoted(address _address);
+    
     constructor() Ownable(msg.sender){ 
     votingPhase = WorkflowStatus.RegisteringVoters;
     emit phaseUpdated(WorkflowStatus.RegisteringVoters);
@@ -45,10 +46,10 @@ contract SimpleStorage is Ownable{
     }
 
     function registerVoter(address _address) public onlyOwner {
+        require(_voters[msg.sender].isRegistered == false,"you have already been registered");
         _voters[_address] = Voter(true,false,0);
         _listVoters.push(_address);
     }
-
 
     function goNextPhase() public onlyOwner{ 
         if(votingPhase == WorkflowStatus.RegisteringVoters){
@@ -79,19 +80,17 @@ contract SimpleStorage is Ownable{
 
         listProposal.push(Proposal(_description));
     }
+    
     function getVoters() public view onlyOwner returns(address[] memory){
         return _listVoters;
     }
 
-    function getProposals() public isRegistered view returns (string[][] memory) {
-        string[][] memory _proposals = new string[][](listProposal.length);
+    function getProposals() public isRegistered view returns (string memory) {
+        string memory proposals;
         for (uint i = 0; i < listProposal.length; i++) {
-            _proposals[i] = new string[](2) ;
-            _proposals[i][0] = Strings.toString(i);
-            _proposals[i][1] = listProposal[i].description;
-
+            proposals = string(abi.encodePacked(proposals, Strings.toString(i), " ", listProposal[i].description, "\n"));
         }
-        return _proposals;
+        return proposals;
     }
 
     function getPhase() public isRegistered view returns (string memory){
@@ -131,21 +130,18 @@ contract SimpleStorage is Ownable{
         for (uint i =0; i< _listVoters.length;i++){
             listCount[_voters[_listVoters[i]].votedProposalId] += 1;
         }
-
     }
-    function getVoteDetails() public isRegistered view returns(string[][] memory){
-        require(votingPhase == WorkflowStatus.VotesTallied,"you can't have vote details yet");
-        string [][] memory res = new string[][](listProposal.length);
-        for (uint i =0; i < listProposal.length; i++){
-            res[i] =  new string[](2);
-            res[i][0] = Strings.toString(listCount[i]);
-            res[i][1] = listProposal[i].description;
+
+    function getVoteDetails() public isRegistered view returns (string memory) {
+        require(votingPhase == WorkflowStatus.VotesTallied, "you can't have vote details yet");
+        string memory details;
+        for (uint i = 0; i < listProposal.length; i++) {
+            details = string(abi.encodePacked(details, Strings.toString(listCount[i]), " vote for ", listProposal[i].description, "\n"));
         }
-
-        return res;
+        return details;
     }
- 
-    function getWinner() public view returns (Proposal memory){
+
+    function getWinner() public view returns (string memory){
         require(votingPhase == WorkflowStatus.VotesTallied, "you can't get winnner yet");
         uint max =0;
         uint index = 0;
@@ -155,10 +151,9 @@ contract SimpleStorage is Ownable{
                 index = i;
             }
         }
-        return listProposal[index];
+        return listProposal[index].description;
  
     }
-
 
     function reset() public onlyOwner{
         votingPhase = WorkflowStatus.RegisteringVoters;
@@ -172,4 +167,4 @@ contract SimpleStorage is Ownable{
     }
      
 
-    }
+}

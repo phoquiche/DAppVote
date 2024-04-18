@@ -89,9 +89,9 @@ export const abi = [
     "name": "getProposals",
     "outputs": [
       {
-        "internalType": "string[][]",
+        "internalType": "string",
         "name": "",
-        "type": "string[][]"
+        "type": "string"
       }
     ],
     "stateMutability": "view",
@@ -102,9 +102,9 @@ export const abi = [
     "name": "getVoteDetails",
     "outputs": [
       {
-        "internalType": "string[][]",
+        "internalType": "string",
         "name": "",
-        "type": "string[][]"
+        "type": "string"
       }
     ],
     "stateMutability": "view",
@@ -128,16 +128,9 @@ export const abi = [
     "name": "getWinner",
     "outputs": [
       {
-        "components": [
-          {
-            "internalType": "string",
-            "name": "description",
-            "type": "string"
-          }
-        ],
-        "internalType": "struct SimpleStorage.Proposal",
+        "internalType": "string",
         "name": "",
-        "type": "tuple"
+        "type": "string"
       }
     ],
     "stateMutability": "view",

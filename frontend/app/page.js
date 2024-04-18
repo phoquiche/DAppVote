@@ -69,6 +69,7 @@ export default function Home() {
       account: account, 
     });
     const { hash } = await writeContract(request);
+    await fetchVotingPhase()
   }
 
   const submitProposal = async () => {
@@ -90,8 +91,6 @@ export default function Home() {
       functionName: 'getProposals',
     });
     setProposals(data);
-
-    
   }
 
   const reset = async () => {
@@ -173,7 +172,12 @@ export default function Home() {
           </p>
           <p>
             <button onClick={getProposals}>Get Proposals</button> :{' '}
-            {proposals}
+            <textarea
+              value={proposals}
+              rows={10}
+              cols={50}
+              readOnly
+            ></textarea>
           </p>
           <p>
             <button onClick={reset}>Reset</button>
@@ -192,7 +196,15 @@ export default function Home() {
           </p>
           <p>
             <button onClick={getVoteDetails}>Get Vote Details</button> :{' '}
-            {voteDetails}
+            <textarea
+              value={voteDetails}
+              rows={10}
+              cols={50}
+              readOnly
+            ></textarea>
+          </p>
+          <p>
+            <button onClick={reset}>Reset</button>
           </p>
         </div>
       ) : (
