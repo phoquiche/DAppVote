@@ -5,7 +5,7 @@ import { abi, contractAddress } from '@/constants';
 import { useAccount } from 'wagmi'
 import { readContract, prepareWriteContract, writeContract } from '@wagmi/core'
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Home() {
 
@@ -13,13 +13,22 @@ export default function Home() {
   const [votingPhase, setVotingPhase] = useState('');
   const [address, setAddress] = useState('');
   const [voters, setVoters] = useState('');
-  const { isConnected } = useAccount();
+  const { isConnected,  account} = useAccount();
+  const [Proposal, setProposal] = useState('');
+  const [proposals, setProposals] = useState('');
+  const [numProposal, setNumProposal] = useState(0);
+  const [voteDetails, setVoteDetails] = useState('');
+
+  useEffect(() => {
+    console.log('account', account);
+  });
 
   const fetchVotingPhase = async () => {
     const data = await readContract({
       address: contractAddress,
       abi: abi,
       functionName: 'getPhase',
+      account: account, 
     });
     setVotingPhase(data);
   };
@@ -29,6 +38,7 @@ export default function Home() {
       address: contractAddress,
       abi: abi,
       functionName: 'registerVoter',
+      account: account, 
       args: [address],
     });
     const { hash } = await writeContract(request);
@@ -39,6 +49,7 @@ export default function Home() {
       address: contractAddress,
       abi: abi,
       functionName: 'getVoters',
+      account: account, 
     });
     const result = insertNewlineBefore0x(data);
     setVoters(result);
@@ -54,8 +65,62 @@ export default function Home() {
       address: contractAddress,
       abi: abi,
       functionName: 'goNextPhase',
+      account: account, 
     });
     const { hash } = await writeContract(request);
+  }
+
+  const submitProposal = async () => {
+    const { request } = await prepareWriteContract({
+      address: contractAddress,
+      abi: abi,
+      functionName: 'submitProposal',
+      args: [Proposal],
+      account: account, 
+
+    });
+    const { hash } = await writeContract(request);
+  }
+
+  const getProposals = async () => {
+    const data = await readContract({
+      address: contractAddress,
+      abi: abi,
+      functionName: 'getProposals',
+    });
+    setProposals(data);
+
+    
+  }
+
+  const reset = async () => {
+    const { request } = await prepareWriteContract({
+      address: contractAddress,
+      abi: abi,
+      functionName: 'reset',
+    });
+    const { hash } = await writeContract(request);
+  }
+
+  const voteProposal = async () => {
+    const { request } = await prepareWriteContract({
+      address: contractAddress,
+      abi: abi,
+      functionName: 'voteProposal',
+      args: [numProposal],
+      account: account, 
+    });
+    const { hash } = await writeContract(request);
+  }
+
+  const getVoteDetails = async () => {
+    const data = await readContract({
+      address: contractAddress,
+      abi: abi,
+      functionName: 'getVoteDetails',
+    });
+    setVoteDetails(data);
+    
   }
 
   return (
@@ -87,6 +152,33 @@ export default function Home() {
               cols={50}
               readOnly
             ></textarea>
+          </p>
+          <p>
+            <button onClick={submitProposal}>Submit Proposal</button>
+            &nbsp;
+            <input
+              type="text"
+              onChange={(e) => setProposal(e.target.value)}
+            />{' '}
+          </p>
+          <p>
+            <button onClick={getProposals}>Get Proposals</button> :{' '}
+            {proposals}
+          </p>
+          <p>
+            <button onClick={reset}>Reset</button>
+          </p>
+          <p>
+            <button onClick={voteProposal}>Vote Proposal</button>
+            &nbsp;
+            <input
+              type="number"
+              onChange={(e) => setNumProposal(e.target.value)}
+            />{' '}
+          </p>
+          <p>
+            <button onClick={getVoteDetails}>Get Vote Details</button> :{' '}
+            {voteDetails}
           </p>
         </div>
       ) : (
