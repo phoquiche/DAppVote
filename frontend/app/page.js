@@ -48,6 +48,16 @@ export default function Home() {
     return str.toString().replace(/0x/g, '\n 0x');
   };
 
+
+  const goNextPhase = async () => {
+    const { request } = await prepareWriteContract({
+      address: contractAddress,
+      abi: abi,
+      functionName: 'goNextPhase',
+    });
+    const { hash } = await writeContract(request);
+  }
+
   return (
     <>
       <ConnectButton />
@@ -58,12 +68,17 @@ export default function Home() {
             {votingPhase}
           </p>
           <p>
+            <button onClick={goNextPhase}>Go Next Phase</button>
+          </p>
+          <p>
+          <button onClick={registerVoter}>Insert an address</button>
+          &nbsp;
             <input
               type="text"
               onChange={(e) => setAddress(e.target.value)}
             />{' '}
-            <button onClick={registerVoter}>Insert an address</button>
           </p>
+          
           <p>
             <button onClick={fetchVoters}>Fetch Voters</button> :{' '}
             <textarea
@@ -75,7 +90,7 @@ export default function Home() {
           </p>
         </div>
       ) : (
-        <p>Please connect your Wallet to our DApp.</p>
+        <p>Please connect your Wallet to our DApp 🥰.</p>
       )}
     </>
   );
