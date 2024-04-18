@@ -10,10 +10,9 @@ import { useState } from 'react';
 export default function Home() {
 
   // The State that will get the number on the blockchain (get method)
-  const [getVotingPhase, setVotingPhase] = useState('');
-  const [setAddress, setSetAddress] = useState();
-
-
+  const [votingPhase, setVotingPhase] = useState('');
+  const [address, setAddress] = useState('');
+  const [voters, setVoters] = useState('');
   const { isConnected } = useAccount();
 
   const fetchVotingPhase = async () => {
@@ -26,29 +25,58 @@ export default function Home() {
   };
 
   const registerVoter = async () => {
-      const { request } = await prepareWriteContract({
-        address: contractAddress,
-        abi: abi,
-        functionName: 'registerVoter',
-        args: [setAddress],
-      });
-      const { hash } = await writeContract(request);
-      console.log('Transaction hash:', hash);
-      // Optionally, you can update the UI or display a success message
+    const { request } = await prepareWriteContract({
+      address: contractAddress,
+      abi: abi,
+      functionName: 'registerVoter',
+      args: [address],
+    });
+    const { hash } = await writeContract(request);
   };
 
+  const fetchVoters = async () => {
+    const data = await readContract({
+      address: contractAddress,
+      abi: abi,
+      functionName: 'getVoters',
+    });
+    const result = insertNewlineBefore0x(data);
+    setVoters(result);
+  };
+
+  const insertNewlineBefore0x = (str) => {
+    return str.toString().replace(/0x/g, '\n 0x');
+  };
 
   return (
     <>
       <ConnectButton />
       {isConnected ? (
         <div>
-          <p><button onClick={fetchVotingPhase}>Fetch Voting Phase</button> : {getVotingPhase}</p>
-          <p><input type="string" onChange={(e) => setSetAddress(e.target.value)} /> <button onClick={registerVoter}>Insert an address</button></p>
+          <p>
+            <button onClick={fetchVotingPhase}>Fetch Voting Phase</button> :{' '}
+            {votingPhase}
+          </p>
+          <p>
+            <input
+              type="text"
+              onChange={(e) => setAddress(e.target.value)}
+            />{' '}
+            <button onClick={registerVoter}>Insert an address</button>
+          </p>
+          <p>
+            <button onClick={fetchVoters}>Fetch Voters</button> :{' '}
+            <textarea
+              value={voters}
+              rows={10}
+              cols={50}
+              readOnly
+            ></textarea>
+          </p>
         </div>
       ) : (
         <p>Please connect your Wallet to our DApp.</p>
       )}
     </>
-  )
+  );
 }

@@ -15,6 +15,7 @@ contract SimpleStorage is Ownable{
     constructor() Ownable(msg.sender){ 
     votingPhase = WorkflowStatus.RegisteringVoters;
     emit phaseUpdated(WorkflowStatus.RegisteringVoters);
+    _listVoters.push(msg.sender);
     }
 
     struct Voter{
