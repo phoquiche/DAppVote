@@ -18,6 +18,7 @@ export default function Home() {
   const [proposals, setProposals] = useState('');
   const [numProposal, setNumProposal] = useState(0);
   const [voteDetails, setVoteDetails] = useState('');
+  const [winner, setWinner] = useState('');
 
   useEffect(() => {
     console.log('account', account);
@@ -123,6 +124,15 @@ export default function Home() {
     
   }
 
+  const getWinner = async () => {
+    const data = await readContract({
+      address: contractAddress,
+      abi: abi,
+      functionName: 'getWinner',
+    });
+    setWinner(data);
+  }
+
   return (
     <>
       <ConnectButton />
@@ -175,6 +185,10 @@ export default function Home() {
               type="number"
               onChange={(e) => setNumProposal(e.target.value)}
             />{' '}
+          </p>
+          <p>
+            <button onClick={getWinner}>Get Winner</button> : {' '}
+            {winner}
           </p>
           <p>
             <button onClick={getVoteDetails}>Get Vote Details</button> :{' '}
