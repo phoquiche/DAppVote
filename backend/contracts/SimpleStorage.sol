@@ -15,7 +15,7 @@ contract SimpleStorage is Ownable{
     constructor() Ownable(msg.sender){ 
     votingPhase = WorkflowStatus.RegisteringVoters;
     emit phaseUpdated(WorkflowStatus.RegisteringVoters);
-    _listVoters.push(msg.sender);
+    registerVoter(msg.sender);
     }
 
     struct Voter{
@@ -157,6 +157,18 @@ contract SimpleStorage is Ownable{
         }
         return listProposal[index];
  
+    }
+
+
+    function reset() public onlyOwner{
+        votingPhase = WorkflowStatus.RegisteringVoters;
+        emit phaseUpdated(WorkflowStatus.RegisteringVoters);
+        for(uint i =0; i< _listVoters.length; i++){
+            delete _voters[_listVoters[i]];
+        }
+        delete _listVoters;
+        delete listProposal;
+        delete listCount;
     }
      
 
