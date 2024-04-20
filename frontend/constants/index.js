@@ -223,4 +223,4 @@ export const abi = [
     "type": "function"
   }
 ]
-export const contractAddress = "0x5fbdb2315678afecb367f032d93f642f64180aa3"
+export const contractAddress = "0x45Bf4Ee055ABc4c9485fAD14796E5D875Ed97F74"
